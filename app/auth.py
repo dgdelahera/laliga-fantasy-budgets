@@ -1,11 +1,9 @@
 import sys
-
 import requests
-from functools import cache
 import logging
 
 
-def code(username, password):
+def get_code(username, password):
     """Returns the authorization code required to request an auth token
     """
     auth_url = "https://api.laligafantasymarca.com/login/v3/email/auth"
@@ -21,11 +19,11 @@ def code(username, password):
     return code
 
 
-def token(username, password):
+def get_token(username, password):
     """Returns an authorization token
     """
     token_url = "https://api.laligafantasymarca.com/login/v3/email/token"
-    token_payload = {"code": code(username, password),
+    token_payload = {"code": get_code(username, password),
                      "policy": "B2C_1A_ResourceOwnerv2"}
     token = requests.post(token_url, data=token_payload).json()["access_token"]
     logging.info(f"Received token {token[:10]}...")

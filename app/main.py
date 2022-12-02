@@ -1,8 +1,14 @@
 import requests
 
+from app.auth import get_token
 from tabulate import tabulate
 
-TOKEN = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IkNBdXdPcWRMN2YyXzlhTVhZX3ZkbEcyVENXbVV4aklXV1MwNVB4WHljcUkifQ.eyJpc3MiOiJodHRwczovL2xvZ2luLmxhbGlnYS5lcy8zMzUzMTZlYi1mNjA2LTQzNjEtYmI4Ni0zNWE3ZWRjZGNlYzEvdjIuMC8iLCJleHAiOjE2NjkxMDc1NTIsIm5iZiI6MTY2OTAyMTE1MiwiYXVkIjoiZmVjOWUzZmQtOGY4OC00NWFiLThjYmQtYjcwYjlkNjVkZGUwIiwiZW1haWwiOiJ0aGVmMWRhbmlAZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6IkRhbmkiLCJmYW1pbHlfbmFtZSI6IkdvbnphbGV6IiwibmFtZSI6Ikdvb2dsZSB1c2VyIiwiaWRwIjoiZ29vZ2xlLmNvbSIsInN1YiI6IjRiOWZlNTA1LTZmOTItNGI4MS05NDQ5LTI0ZWU4NjE0ZDMzOCIsImV4dGVuc2lvbl9FbWFpbFZlcmlmaWVkIjp0cnVlLCJleHRlbnNpb25fVXNlclByb2ZpbGVJZCI6ImJjMGVmMjI3LTVkNTYtNDRmZS1hNTIwLTY3YWU5YWJlMTZlNCIsIm9pZCI6ImJjMGVmMjI3LTVkNTYtNDRmZS1hNTIwLTY3YWU5YWJlMTZlNCIsImF6cCI6ImZlYzllM2ZkLThmODgtNDVhYi04Y2JkLWI3MGI5ZDY1ZGRlMCIsInZlciI6IjEuMCIsImlhdCI6MTY2OTAyMTE1Mn0.lH9fQZG4GPm5Afm9tmlV1Sa4cfrfZ6uylX7iDU1PLSOS1dl3N07YoZK3q7OGv_nnQ7ak5BBy9gHK9HCoBTpPY8mdPsYKLjK3AvEot-yYJvSXofEIC5KnL6aVZvqJs3FFEaxGmSynqrn8QvE4b06bbGh56r00cESZ1T6Pio7KO8Au0Nt7diTjygNBJUChKKejgq76F2Yc6CirGR1gzqgMwEGW5npLOj6BxEm_9wNKHY81-tFn-XqxPCVsrybtQFw3S0-k5mkTrWn3SpQb03zbEEfVywm-SiNdEBZs2MCC2aPb4woQ8oJF80J2q7hS31-ydJWUi5KrxSdBDDxVbQN2lw"
+USERNAME = "your_username"
+PASSWORD = "your_password"
+USE_TOKEN = False
+TOKEN = ""
+LEAGUE_ID = "1234"
+
 
 class Player:
     def __init__(self, name: str, team_value: int):
@@ -34,9 +40,9 @@ def print_players_value(players):
     print(tabulate(print_result, headers=['Player', 'Budget', 'Total Value'], tablefmt='orgtbl'))
 
 
-def get_players():
-    url = "https://api.laligafantasymarca.com/api/v4/leagues/012408899/ranking?x-lang=es"
-    data = requests.get(url,headers={'authorization': TOKEN}).json()
+def get_players(token):
+    url = f"https://api.laligafantasymarca.com/api/v4/leagues/{LEAGUE_ID}/ranking?x-lang=es"
+    data = requests.get(url,headers={'authorization': token}).json()
     players = []
     for team in data:
         players.append(Player(name=team['team']['manager']['managerName'], team_value=team['team']['teamValue']))
@@ -62,11 +68,11 @@ def update_players_budget(players, player_sell, player_buy, amount):
             print(f"Player not found: {player_buy}")
 
 
-def check_players_operations(players):
+def check_players_operations(players, token):
     i = 1
     operaciones = []
     while True:
-        data = requests.get(f"https://api.laligafantasymarca.com/api/v3/leagues/012408899/news/{i}?x-lang=es", headers={'authorization':TOKEN}).json()
+        data = requests.get(f"https://api.laligafantasymarca.com/api/v3/leagues/012408899/news/{i}?x-lang=es", headers={'authorization':token}).json()
         if not data:
             break
         operaciones = operaciones + data
@@ -91,8 +97,12 @@ def check_players_operations(players):
 
 
 def main():
-    players = get_players()
-    check_players_operations(players)
+    if USE_TOKEN:
+        token = TOKEN
+    else:
+        token = get_token()
+    players = get_players(token)
+    check_players_operations(players, token)
     print_players_value(players)
 
 
