@@ -17,3 +17,13 @@ your credentials!**
 4. Run `python app/main.py`
 5. If you have registered with using your Google account, you will have to repeat the steps in 3. in order to get a valid token. Use 
 that token in the `TOKEN` variable. These tokens have a duration of 24 hours. I haven't still figured out how to do this automatically.
+
+
+## TODOs
+
+I don't want to spend too much time in this project, but if you want to do it, these are the possible betterments:
+- Store the credentials safely. Possible options
+  - In a file ignored by `.gitignore`
+  - Read them from args or env variables
+- For Google accounts, get the token automatically
+- Figure out how to get the money spend on clauses.
